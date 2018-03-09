@@ -1,19 +1,45 @@
 module.exports = function solveSudoku(matrix) {
     // your solution
-    for (let x = 0; x < 9; x++) {
-        for (let y = 0; y < 9; y++) {
-            if (matrix[x][y] === 0) {
-                let result = [];
-                for (let i = 0; i < 9; i++) {
-                    result.push([matrix[x][i], matrix[i][y], matrix[Math.floor(x / 3) * 3 + i % 3]
-                        [Math.floor(y / 3) * 3 + Math.floor(i / 3)]])
-                }
-                for (let i=0;i<result.length;i++) {
-                    matrix[x][y] = result[i];
-                    solveSudoku(matrix);
-                }
+    if (solve(0,0,matrix)){
+        return matrix;
+    }
+
+    function solve(i,j,tempMatrix) {
+        if (i === 9) {
+            i = 0;
+            if (++j === 9)
+                return true;
+        }
+        if (tempMatrix[i][j] !== 0)
+            return solve(i+1,j,tempMatrix);
+
+        for (let val = 1; val <= 9; ++val) {
+            if (isValid(i,j,val,tempMatrix)) {
+                tempMatrix[i][j] = val;
+                if (solve(i+1,j,tempMatrix))
+                    return true;
             }
         }
+        tempMatrix[i][j] = 0;
+        return false;
     }
-    return matrix;
+
+    function isValid(i,j,val,tempMatrix) {
+        for (let k = 0; k < 9; ++k)
+        if (val === tempMatrix[k][j])
+            return false;
+
+        for (let k = 0; k < 9; ++k)
+        if (val === tempMatrix[i][k])
+            return false;
+
+        let rowOffset = Math.floor(i / 3)*3;
+        let colOffset = Math.floor(j / 3)*3;
+        for (let k = 0; k < 3; ++k)
+        for (let m = 0; m < 3; ++m)
+        if (val === tempMatrix[rowOffset+k][colOffset+m])
+            return false;
+
+        return true;
+    }
 }
